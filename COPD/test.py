@@ -2,19 +2,34 @@ from utils.data_utils import *
 import matplotlib.pyplot as plt
 import opts
 from sklearn.model_selection import train_test_split
+from dataloader.copd_dataloader import CopdDataloader,CopdDataset
 
 
 opt=opts.parse_opt()
 
+
 data,all_label=preprocese_data(opt)
 # print a.iloc[22]
+
+
+
 # print [(c_label,int(data[c_label].sum())) for c_label in all_label]
-train_df, valid_df = train_test_split(data, 
-                                   test_size = 0.25, 
-                                   random_state = 2018,
-                                   stratify = data['Finding Labels'].map(lambda x: x[:4]))
-data=data.iloc[:10]
-print data.iloc[0]
+dataloader=CopdDataloader(opt,data)
+
+# dataset=CopdDataset(root_dir=opt.root_dir,data_df=data)
+# for i in range(len(dataset)):
+    # sample=dataset[i]
+    # if sample['image'].shape==(1024,1024,4):
+        # print sample['image']
+        # print sample['label']
+l=dataloader.get_loader()
+
+for a,b in enumerate(l):
+    print (a,b['label'].size())
+
+
+
+
 
 
 # exit()
