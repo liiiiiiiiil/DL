@@ -14,7 +14,6 @@ train_df, valid_df = train_test_split(data,
                                    random_state = 2018,
                                    stratify = data['Finding Labels'].map(lambda x: x[:4]))
 data=data.iloc[:10]
-data=add_image_path(opt,data)
 print data.iloc[0]
 
 
