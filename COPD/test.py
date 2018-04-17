@@ -25,7 +25,7 @@ dataloader=CopdDataloader(opt,data)
 l=dataloader.get_loader()
 
 for a,b in enumerate(l):
-    print (a,b['label'].size())
+    print (a,b['image'].size())
 
 
 
