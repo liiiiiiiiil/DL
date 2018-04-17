@@ -39,7 +39,7 @@ def preprocese_data(opt):
     return data,all_labels
 
 def split_data(opt,data):
-    train_df,valid_df=train_test_split(data,test_size=0.25,random_state=2018,stratify=all_xray_df['Finding Labels'].map(lambda x:x[:4]))
+    train_df,valid_df=train_test_split(data,test_size=0.25,random_state=2018,stratify=data['Finding Labels'].map(lambda x:x[:4]))
     return train_df,valid_df
 
 

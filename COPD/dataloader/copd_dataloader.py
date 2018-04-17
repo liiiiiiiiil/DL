@@ -25,7 +25,7 @@ class PreTrans(object):
         label=sample['label']
         if len(image.shape)==2:
             image=image[:,:,np.newaxis]
-        label=label.astype(float)
+        label=label.astype(np.float32)
         return {'image':image,'label':label}
 
 class Rescale(object):
@@ -47,15 +47,16 @@ class Rescale(object):
             new_h,new_w=self.output_size
 
         new_h,new_w=int(new_h),int(new_w)
-        img=transform.resize(image,(new_h,mew_w))
+        img=transform.resize(image,(new_h,new_w))
         return {'image':img,'label':label}
 
 
 class ToTensor(object):
 
     def __call__(self,sample):
-        image,label=_process_sample(sample)
+        # image,label=_process_sample(sample)
         # label=label.astype(float)
+        image,label=sample['image'],sample['label']
 
         return {'image':torch.from_numpy(image),
                 'label':torch.from_numpy(label)}
@@ -142,19 +143,24 @@ class CopdDataloader():
         self.num_workers=opt.num_workers
         self.root_dir=opt.root_dir
         self.data_df=data_df
+        self.test_batch_size=opt.test_batch_size
         self.transform=transforms.Compose([
             PreTrans(),
             RemoveCenter(),
             Normalize(),
             Rotate(opt.max_rotate_degree),
             Rescale(opt.rescale_size),
-            RandomCrop(opt.cnn_image_size)
+            RandomCrop(opt.cnn_image_size),
+            ToTensor()
             ])
 
-    def get_loader(self):
+    def get_train_loader(self):
         self.dataset=CopdDataset(self.root_dir,self.data_df,self.transform)
         return DataLoader(self.dataset,batch_size=self.batch_size,shuffle=self.shuffle,num_workers=self.num_workers)
 
+    def get_test_loader(self):
+        self.dataset=CopdDataset(self.root_dir,self.data_df,self.transform)
+        return DataLoader(self.dataset,batch_size=self.test_batch_size,shuffle=self.shuffle,num_workers=self.num_workers)
 
 
 
