@@ -12,6 +12,9 @@ def parse_opt():
     parser.add_argument('--batch_size',type=int,default=33)
     parser.add_argument('--shuffle',type=bool,default=True)
     parser.add_argument('--num_workers',type=int,default=0)
+    parser.add_argument('--max_rotate_degree',type=int,default=5)
+    parser.add_argument('--rescale_size',type=int,default=136)
+    parser.add_argument('--cnn_image_size',type=int,default=128)
 
 
 

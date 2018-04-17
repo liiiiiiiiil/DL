@@ -88,8 +88,8 @@ class Rotate(object):
     def __call__(self,sample):
 
         image,label=sample['image'],sample['label']
-        degree=np.random.randint(-max_degree,max_degree)
-        image=Image.rotate(degree)
+        degree=np.random.randint(-self.max_degree,self.max_degree)
+        image=transform.rotate(image,degree)
         return {'image':image,'label':label}
 
 class Normalize(object):
