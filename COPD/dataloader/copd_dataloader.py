@@ -37,10 +37,14 @@ class AfterTransX(object):
 
     def __call__(self,image):
 
-        image=np.array(image)
-        # print image
-        image=image[:,:,0]
-        image=image[:,:,np.newaxis]
+        # image=np.array(image)
+        # print image.shape
+        image=image[0,:,:]
+        # print image.shape
+        # exit()
+        # image=image[:,:,0]
+        # image=image[:,:,np.newaxis]
+        image=image.unsqueeze(0)
         return image
 
 
@@ -150,7 +154,7 @@ class CopdDataset(Dataset):
         img_name=os.path.join(self.root_dir,self.data_df.iloc[idx]['Image Index'])
         image=io.imread(img_name)
         label=self.data_df.iloc[idx]['disease_vec']
-        label=label.astype(float)
+        label=label.astype(np.float32)
         label=torch.from_numpy(label)
 
         if self.transform:
@@ -178,9 +182,9 @@ class CopdDataloader():
             RandomRotation(opt.max_rotate_degree),
             RandomHorizontalFlip(),
             RandomCrop(opt.cnn_image_size),
-            # AfterTransX(),
             ToTensor(),
-            Normalize([0],[2])
+            Normalize([0.495,0.495,0.495],[0.230,0.230,0.230]),
+            AfterTransX()
             ])
 
     def get_train_loader(self):

@@ -38,8 +38,9 @@ def preprocese_data(opt):
     data['disease_vec']=data.apply(lambda x:[x[all_labels].values],1).map(lambda x:x[0])
     return data,all_labels
 
-def split_data(opt,data):
-    train_df,valid_df=train_test_split(data,test_size=0.25,random_state=2018,stratify=data['Finding Labels'].map(lambda x:x[:4]))
+def split_data(data):
+    #####
+    train_df,valid_df=train_test_split(data,test_size=0.25,stratify=data['Finding Labels'].map(lambda x:x[:4]))
     return train_df,valid_df
 
 

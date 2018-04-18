@@ -20,6 +20,9 @@ def train(opt,train_loader,model,criterion,optimizer,epoch):
         target=target.cuda(async=True)
         input_var=torch.autograd.Variable(input).cuda()
         target_var=torch.autograd.Variable(target)
+        # print target
+
+        # exit()
         if opt.half:
             input_var=input_var.half()
 

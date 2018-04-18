@@ -20,7 +20,7 @@ def run(opt):
 
 
     data_df,_=data_utils.preprocese_data(opt)
-    train_df,test_df=data_utils.split_data(opt,data_df)
+    train_df,test_df=data_utils.split_data(data_df)
 
     train_loader=copd_dataloader.CopdDataloader(opt,train_df).get_train_loader()
     test_loader=copd_dataloader.CopdDataloader(opt,test_df).get_test_loader()
@@ -48,7 +48,7 @@ def run(opt):
 
     cudnn.benchmark=True
 
-    criterion=nn.CrossEntropyLoss().cuda()
+    criterion=nn.BCELoss().cuda()
 
     if opt.half:
         model.half()

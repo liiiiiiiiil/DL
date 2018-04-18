@@ -23,6 +23,7 @@ class VGG(nn.Module):
             nn.Linear(512, 512),
             nn.ReLU(True),
             nn.Linear(512, 13),
+            nn.Sigmoid()
         )
          # Initialize weights
         for m in self.modules():
@@ -34,9 +35,9 @@ class VGG(nn.Module):
 
     def forward(self, x):
         x = self.features(x)
-        # print x.shape
         x = x.view(x.size(0), -1)
         x = self.classifier(x)
+        # print x
         return x
 
 

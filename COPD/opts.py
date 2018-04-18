@@ -7,7 +7,7 @@ def parse_opt():
     parser.add_argument('--input_csv_path',type=str,default='~/data/DL/copd_data/Data_Entry_2017.csv')
     parser.add_argument('--max_classes',type=int,default=15)
     parser.add_argument('--min_cases',type=int,default=1000)
-    parser.add_argument('--num_sample',type=int,default=1000)
+    parser.add_argument('--num_sample',type=int,default=5000)
     parser.add_argument('--test_size_rate',type=float,default=0.25)
     parser.add_argument('--batch_size',type=int,default=10)
     parser.add_argument('--test_batch_size',type=int,default=25)
@@ -24,6 +24,7 @@ def parse_opt():
     parser.add_argument('--weight_decay',type=float,default=5e-4)
     parser.add_argument('--epochs',type=int,default=300)
     parser.add_argument('--save_dir',type=str,default='save/')
+    parser.add_argument('--print_freq',type=int,default=50)
     # parser.add_
 
 

@@ -11,8 +11,11 @@ opt=opts.parse_opt()
 data,all_label=preprocese_data(opt)
 # print a.iloc[22]
 
+# train_data,test_data=train_test_split(data,test_size=0.25,stratify=data['Finding Labels'].map(lambda x:x[:4]))
 # print [(c_label,int(data[c_label].sum())) for c_label in all_label]
-dataloader=CopdDataloader(opt,data)
+
+train_data,test_data=split_data(data)
+dataloader=CopdDataloader(opt,test_data)
 
 # dataset=CopdDataset(root_dir=opt.root_dir,data_df=data)
 # for i in range(len(dataset)):
@@ -20,13 +23,14 @@ dataloader=CopdDataloader(opt,data)
     # if sample['image'].shape==(1024,1024,4):
         # print sample['image']
         # print sample['label']
-l=dataloader.get_train_loader()
+l=dataloader.get_test_loader()
 for a,b in enumerate(l):
-    if a==2:
+    if a==5:
         break
     image_batch=b['image']
     label_batch=b['label']
-    print image_batch.shape
+    print label_batch[0]
+    # print image_batch.shape
 
     # print image_batch.dtype
 
