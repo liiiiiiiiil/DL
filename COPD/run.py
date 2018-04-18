@@ -8,12 +8,13 @@ from model import VGG
 from dataloader import copd_dataloader
 from utils import data_utils
 from utils import run_utils
+import train
 
 
 
 
 def run(opt):
-    model=VGG.vgg16_bn()
+    model=VGG.vgg16()
     model.features=torch.nn.DataParallel(model.features)
     model.cuda()
 
@@ -23,6 +24,15 @@ def run(opt):
 
     train_loader=copd_dataloader.CopdDataloader(opt,train_df).get_train_loader()
     test_loader=copd_dataloader.CopdDataloader(opt,test_df).get_test_loader()
+
+
+    # print len(test_loader)
+    # for i,b in enumerate(test_loader):
+    #     image=b['image']
+    #     label=b['label']
+    #     print image.shape
+    #     print label.shape
+    # exit()
 
     if opt.model_path:
         if os.path.isfile(opt.model_path):
@@ -53,9 +63,8 @@ def run(opt):
     for epoch in range(opt.start_epoch,opt.epochs):
         run_utils.adjust_learning_rate(optimizer,epoch,learning_rate)
 
-        train(train_loader,model,criterion,optimizer,epoch)
+        train.train(opt,train_loader,model,criterion,optimizer,epoch)
         # prec1=validate(val_loader,model,criterion)
-
         # is_best=prec1>best_prec1
         # best_prec1=max(prec1,best_prec1)
         save_checkpoint({

@@ -23,7 +23,7 @@ def save_checkpoint(state,filename='checkpoint.pth.tar'):
 
 def adjust_learning_rate(optimizer,epoch,learning_rate):
     """"""
-    learning_rate=opt*(0.5**(epoch//30))
+    learning_rate=learning_rate*(0.5**(epoch//30))
     for param_group in optimizer.param_groups:
         param_group['learning_rate']=learning_rate
 

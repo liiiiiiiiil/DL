@@ -1,4 +1,5 @@
 import torch
+import time
 from utils.run_utils import *
 
 def train(opt,train_loader,model,criterion,optimizer,epoch):
@@ -11,8 +12,10 @@ def train(opt,train_loader,model,criterion,optimizer,epoch):
     model.train()
     end=time.time()
 
-    for i,(input,target) in enumerate(train_loader):
+    for i,sample in enumerate(train_loader):
 
+        input=sample['image']
+        target=sample['label']
         data_time.update(time.time()-end)
         target=target.cuda(async=True)
         input_var=torch.autograd.Variable(input).cuda()

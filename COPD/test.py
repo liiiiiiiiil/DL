@@ -11,8 +11,6 @@ opt=opts.parse_opt()
 data,all_label=preprocese_data(opt)
 # print a.iloc[22]
 
-
-
 # print [(c_label,int(data[c_label].sum())) for c_label in all_label]
 dataloader=CopdDataloader(opt,data)
 
@@ -22,14 +20,18 @@ dataloader=CopdDataloader(opt,data)
     # if sample['image'].shape==(1024,1024,4):
         # print sample['image']
         # print sample['label']
-l=dataloader.get_loader()
-
+l=dataloader.get_train_loader()
 for a,b in enumerate(l):
+    if a==2:
+        break
     image_batch=b['image']
+    label_batch=b['label']
     print image_batch.shape
+
     # print image_batch.dtype
 
-image_batch=image_batch[:,:,:,0]
+
+# image_batch=image_batch[:,:,:,0]
 # image=image_batch[,:,:]
 
 np.save('./lihao.npy',image_batch)

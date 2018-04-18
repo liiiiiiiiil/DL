@@ -5,11 +5,12 @@ import pandas as pd
 from skimage import io,transform
 import numpy as np
 import matplotlib.pyplot as plt
+from torchvision.transforms import Normalize,Resize,RandomCrop,RandomHorizontalFlip,RandomRotation,ToTensor,ToPILImage
 from torch.utils.data import Dataset,DataLoader
 from torchvision import transforms,utils
 from PIL import Image
 sys.path.insert(0,"../")
-from utils.data_utils import *
+# from torchvision.nn.trans
 
 # def _process_sample(sample):
 #     image=sample['image']
@@ -18,17 +19,32 @@ from utils.data_utils import *
 #         image=image[:,:,np.newaxis]
 #     label=label.astype(float)
 #     return image,label
-class PreTrans(object):
+class PreTransX(object):
 
-    def __call__(self,sample):
-        image=sample['image']
-        label=sample['label']
-        if len(image.shape)==2:
-            image=image[:,:,np.newaxis]
-        label=label.astype(np.float32)
-        return {'image':image,'label':label}
+    def __call__(self,image):
 
-class Rescale(object):
+
+        if len(image.shape)==3:
+            image=image[:,:,0]
+
+        arrays=[image for _ in range(3)]
+        image=np.stack(arrays,axis=2)
+        # print image.shape
+       
+        return image
+
+class AfterTransX(object):
+
+    def __call__(self,image):
+
+        image=np.array(image)
+        # print image
+        image=image[:,:,0]
+        image=image[:,:,np.newaxis]
+        return image
+
+
+class RescaleX(object):
 
     def __init__(self,output_size):
         assert isinstance(output_size,(int,tuple))
@@ -51,17 +67,15 @@ class Rescale(object):
         return {'image':img,'label':label}
 
 
-class ToTensor(object):
+class ToTensorX(object):
 
     def __call__(self,sample):
-        # image,label=_process_sample(sample)
-        # label=label.astype(float)
         image,label=sample['image'],sample['label']
 
         return {'image':torch.from_numpy(image),
                 'label':torch.from_numpy(label)}
 
-class RandomCrop(object):
+class RandomCropX(object):
     def __init__(self,output_size):
         assert isinstance(output_size,(int,tuple))
         if isinstance(output_size,int):
@@ -81,7 +95,7 @@ class RandomCrop(object):
         image=image[top:top+new_h,left:left+new_w]
         return {'image':image,'label':label}
 
-class Rotate(object):
+class RotateX(object):
 
     def __init__(self,max_degree):
         self.max_degree=max_degree
@@ -93,7 +107,7 @@ class Rotate(object):
         image=transform.rotate(image,degree)
         return {'image':image,'label':label}
 
-class Normalize(object):
+class NormalizeX(object):
 
     def __call__(self,sample):
 
@@ -101,7 +115,7 @@ class Normalize(object):
         image=image/np.std(image)
         return {'image':image,'label':label}
 
-class RemoveCenter(object):
+class RemoveCenterX(object):
 
     def __call__(self,sample):
 
@@ -110,6 +124,16 @@ class RemoveCenter(object):
         mean=image.mean(axis=1)
         image=image-mean
         image=image[:,:,np.newaxis]
+        return {'image':image,'label':label}
+
+class TransposeX(object):
+
+    def __call__(self,sample):
+
+        image,label=sample['image'],sample['label']
+        # image=image[:,:,0]
+        # image=image.transpose([2,0,1])
+        image=np.transpose(image,(2,0,1))
         return {'image':image,'label':label}
 
 class CopdDataset(Dataset):
@@ -126,11 +150,14 @@ class CopdDataset(Dataset):
         img_name=os.path.join(self.root_dir,self.data_df.iloc[idx]['Image Index'])
         image=io.imread(img_name)
         label=self.data_df.iloc[idx]['disease_vec']
-        sample={'image':image,'label':label}
+        label=label.astype(float)
+        label=torch.from_numpy(label)
 
         if self.transform:
-            sample=self.transform(sample)
+            image=self.transform(image)
 
+
+        sample={'image':image,'label':label}
         return sample
 
 
@@ -145,13 +172,15 @@ class CopdDataloader():
         self.data_df=data_df
         self.test_batch_size=opt.test_batch_size
         self.transform=transforms.Compose([
-            PreTrans(),
-            RemoveCenter(),
-            Normalize(),
-            Rotate(opt.max_rotate_degree),
-            Rescale(opt.rescale_size),
+            PreTransX(),
+            ToPILImage(),
+            Resize(opt.rescale_size),
+            RandomRotation(opt.max_rotate_degree),
+            RandomHorizontalFlip(),
             RandomCrop(opt.cnn_image_size),
-            ToTensor()
+            # AfterTransX(),
+            ToTensor(),
+            Normalize([0],[2])
             ])
 
     def get_train_loader(self):
