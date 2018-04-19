@@ -40,7 +40,9 @@ def preprocese_data(opt):
 
 def split_data(data):
     #####
-    train_df,valid_df=train_test_split(data,test_size=0.25,stratify=data['Finding Labels'].map(lambda x:x[:4]))
+    train_df,valid_df=train_test_split(data,test_size=0.2,stratify=data['Finding Labels'].map(lambda x:x[:4]))
+    # lenth=len(data)
+    # test_data_len=lenth//4
     return train_df,valid_df
 
 

@@ -4,11 +4,13 @@ import opts
 from sklearn.model_selection import train_test_split
 from dataloader.copd_dataloader import CopdDataloader,CopdDataset
 from PIL import Image
+import torch
 
 opt=opts.parse_opt()
 
 
 data,all_label=preprocese_data(opt)
+print len(data)
 # print a.iloc[22]
 
 # train_data,test_data=train_test_split(data,test_size=0.25,stratify=data['Finding Labels'].map(lambda x:x[:4]))
@@ -16,6 +18,7 @@ data,all_label=preprocese_data(opt)
 
 train_data,test_data=split_data(data)
 dataloader=CopdDataloader(opt,test_data)
+
 
 # dataset=CopdDataset(root_dir=opt.root_dir,data_df=data)
 # for i in range(len(dataset)):
@@ -25,10 +28,17 @@ dataloader=CopdDataloader(opt,test_data)
         # print sample['label']
 l=dataloader.get_test_loader()
 for a,b in enumerate(l):
-    if a==5:
-        break
+    
     image_batch=b['image']
     label_batch=b['label']
+    # print label_batch.shape
+    result=label_batch.sum(dim=1)
+    print result
+
+
+    exit()
+    if a==5:
+        break
     print label_batch[0]
     # print image_batch.shape
 
