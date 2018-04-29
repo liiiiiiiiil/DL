@@ -1,3 +1,4 @@
+import os
 import opts
 import torch
 import torch.nn as nn
@@ -8,23 +9,22 @@ from model import VGG
 from dataloader import copd_dataloader
 from utils import data_utils
 from utils import run_utils
-import train
+from  train import *
+from validate import *
 
 
 
 
 def run(opt):
-    model=VGG.vgg16()
+    model=VGG.vgg16_bn()
     model.features=torch.nn.DataParallel(model.features)
     model.cuda()
-
 
     data_df,_=data_utils.preprocese_data(opt)
     train_df,test_df=data_utils.split_data(data_df)
 
     train_loader=copd_dataloader.CopdDataloader(opt,train_df).get_train_loader()
-    test_loader=copd_dataloader.CopdDataloader(opt,test_df).get_test_loader()
-
+    val_loader=copd_dataloader.CopdDataloader(opt,test_df).get_test_loader()
 
     # print len(test_loader)
     # for i,b in enumerate(test_loader):
@@ -33,6 +33,9 @@ def run(opt):
     #     print image.shape
     #     print label.shape
     # exit()
+
+
+    best_result=0
 
     if opt.model_path:
         if os.path.isfile(opt.model_path):
@@ -43,10 +46,12 @@ def run(opt):
             model.load_state_dict(checkpoint['state_dict'])
             print("=>loaded checkpoint(epoch{})"
                     .format(checkpoint['epoch']))
+            losslist=checkpoint['losslist']
+            # best_result=checkpoint['best_result']
         else:
             print "=>no checkpoint found at '{}'".format(opt.model_path)
 
-    cudnn.benchmark=True
+    cudnn.benchmark=True 
 
     criterion=nn.BCELoss().cuda()
 
@@ -54,23 +59,30 @@ def run(opt):
         model.half()
         criterion.half()
     learning_rate=opt.learning_rate
-    optimizer=torch.optim.SGD(model.parameters(),learning_rate,momentum=opt.momentum,weight_decay=opt.weight_decay)
+    # optimizer=torch.optim.SGD(model.parameters(),learning_rate,momentum=opt.momentum,weight_decay=opt.weight_decay)
+    optimizer=torch.optim.Adam(model.parameters(),learning_rate,weight_decay=opt.weight_decay)
 
-    # if opt.evaluate:
-    #     validate(val_loader,model,criterion)
-    #     return
+    if opt.evaluate:
+         validate(opt,val_loader,model,criterion)
+         return
+
+    #loss
+    losslist=[]
+
 
     for epoch in range(opt.start_epoch,opt.epochs):
         run_utils.adjust_learning_rate(optimizer,epoch,learning_rate)
 
-        train.train(opt,train_loader,model,criterion,optimizer,epoch)
-        # prec1=validate(val_loader,model,criterion)
-        # is_best=prec1>best_prec1
-        # best_prec1=max(prec1,best_prec1)
-        save_checkpoint({
+        train(opt,train_loader,model,criterion,optimizer,epoch,losslist)
+        result=validate(opt,val_loader,model,criterion)
+        print ('the binary accurracy is:{0}'.format(result))  
+        is_best=result>best_result
+        best_result=max(result,best_result)
+        run_utils.save_checkpoint({
             'epoch':epoch+1,
-            'state_dict':model.state_dcit()
-            # 'best_prec1':best_prec1,
+            'state_dict':model.state_dict(),
+            'losslist':losslist,
+            'best_result':best_result,
         },filename=os.path.join(opt.save_dir,'checkpoint_{}.tar'.format(epoch)))
 
 

@@ -5,18 +5,24 @@ from sklearn.model_selection import train_test_split
 from dataloader.copd_dataloader import CopdDataloader,CopdDataset
 from PIL import Image
 import torch
-
+import numpy as np
 opt=opts.parse_opt()
 
 
 data,all_label=preprocese_data(opt)
-print len(data)
 # print a.iloc[22]
 
 # train_data,test_data=train_test_split(data,test_size=0.25,stratify=data['Finding Labels'].map(lambda x:x[:4]))
 # print [(c_label,int(data[c_label].sum())) for c_label in all_label]
 
 train_data,test_data=split_data(data)
+vecs=test_data['disease_vec'].values
+for i in range(800):
+   vec=vecs[i] 
+   if np.sum(vec)==0:
+       print i
+
+exit()
 dataloader=CopdDataloader(opt,test_data)
 
 
