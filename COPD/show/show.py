@@ -12,12 +12,15 @@ from utils.data_utils import *
 import opts
 
 
+
+
+
+
 def show_raw_csv_data(opts):
     data=read_data(opts)
     print "the raw csv data:"
     print data.head()
 
 
-def show_
 
 

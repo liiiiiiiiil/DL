@@ -9,12 +9,16 @@ def validate(opt,val_loader,model,criterion):
     losses=AverageMeter()
     top1=AverageMeter()
     model.eval()
-
     end=time.time()
+
+
+    sampledata={'image':[],'label':[]}    
 
     for i,sample in enumerate(val_loader):
         input=sample['image']
         target=sample['label']
+        sampledata['image'].append(input)
+        sampledata['label'].append(target)
         target=target.cuda(async=True)
         input_var=torch.autograd.Variable(input,volatile=True).cuda()
         target_var=torch.autograd.Variable(target,volatile=True)
@@ -41,5 +45,6 @@ def validate(opt,val_loader,model,criterion):
                   'Accuracy:{top1.val:.3f}({top1.avg:.3f})'.format(i,len(val_loader),
                   batch_time=batch_time,loss=losses,top1=top1))
 
+    np.save('./sampledata.npy',sampledata)
     return result 
 

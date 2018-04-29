@@ -19,15 +19,12 @@ def parse_opt():
     parser.add_argument('--model_path',type=str,default='')
     parser.add_argument('--start_epoch',type=int,default=0)
     parser.add_argument('--half',type=bool,default=False)
-    parser.add_argument('--learning_rate',type=float,default=0.00001)
-    # parser.add_argument('--momentum',type=float,default=0.9)
+    parser.add_argument('--learning_rate',type=float,default=5e-6)
     parser.add_argument('--weight_decay',type=float,default=5e-4)
     parser.add_argument('--epochs',type=int,default=10)
     parser.add_argument('--save_dir',type=str,default='/home/lihao/data/DL/save/')
     parser.add_argument('--print_freq',type=int,default=10)
     parser.add_argument('--evaluate',type=bool,default=False,help='True:evaluate,Flase:train only')
-    # parser.add_
-
 
 
     args=parser.parse_args()
